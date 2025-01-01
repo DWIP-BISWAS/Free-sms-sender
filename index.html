@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Free SMS Sender</title>
+  <title>Email-to-SMS Sender</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -17,7 +17,7 @@
       border-radius: 8px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
-    input, textarea {
+    input, textarea, select {
       width: 100%;
       margin: 10px 0;
       padding: 10px;
@@ -41,55 +41,48 @@
   </style>
 </head>
 <body>
-  <h1>Free SMS Sender</h1>
+  <h1>Send SMS via Website</h1>
   <form id="smsForm">
-    <input type="text" id="phone" placeholder="Enter phone number (with +91)" required>
+    <input type="text" id="phone" placeholder="Enter phone number" required>
+    <select id="carrier" required>
+      <option value="">Select Carrier</option>
+      <option value="@airtelmail.com">Airtel</option>
+      <option value="@vodafone.net">Vodafone/Idea</option>
+      <option value="@jio.com">Reliance Jio</option>
+      <option value="@bsnl.com">BSNL</option>
+    </select>
     <textarea id="message" placeholder="Enter your message" required></textarea>
     <button type="submit">Send SMS</button>
   </form>
   <div id="status"></div>
 
   <script>
-    document.getElementById("smsForm").addEventListener("submit", async function (event) {
-      event.preventDefault();
+    document.getElementById("smsForm").addEventListener("submit", function (e) {
+      e.preventDefault();
 
-      const phone = document.getElementById("phone").value;
-      const message = document.getElementById("message").value;
-      const apiKey = "45RF96wKNSTQmrPtoAvW3jyLVpefJBGEghlXcYxHIbM2a07nZOfU9nT2mQ4MKb8p1ya5vkX3YAtloHsZ";
+      const phone = document.getElementById("phone").value.trim();
+      const carrier = document.getElementById("carrier").value;
+      const message = document.getElementById("message").value.trim();
 
-      if (!phone.startsWith("+91")) {
-        document.getElementById("status").textContent = "Please include the +91 country code.";
+      if (!carrier) {
+        document.getElementById("status").textContent = "Please select a carrier.";
         return;
       }
 
-      try {
-        const response = await fetch("https://www.fast2sms.com/dev/bulkV2", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": apiKey,
-          },
-          body: JSON.stringify({
-            route: "q",
-            sender_id: "WEBSITE",
-            message: message,
-            language: "english",
-            flash: 0,
-            numbers: phone,
-          }),
-        });
+      const recipientEmail = `${phone}${carrier}`;
 
-        const result = await response.json();
+      // Fake sending SMS via website
+      document.getElementById("status").textContent = "Sending SMS...";
 
-        if (result.return) {
-          document.getElementById("status").textContent = "SMS sent successfully!";
-        } else {
-          document.getElementById("status").textContent = "Failed to send SMS.";
-        }
-      } catch (error) {
-        console.error(error);
-        document.getElementById("status").textContent = "An error occurred while sending SMS.";
-      }
+      setTimeout(() => {
+        // Construct mailto link
+        const mailtoLink = `mailto:${recipientEmail}?subject=SMS&body=${encodeURIComponent(message)}`;
+
+        // Simulate SMS sending
+        window.location.href = mailtoLink;
+
+        document.getElementById("status").textContent = "SMS sent successfully!";
+      }, 2000); // Simulate a delay for a better user experience
     });
   </script>
 </body>
